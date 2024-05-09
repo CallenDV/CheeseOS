@@ -95,7 +95,7 @@ compare_command:
     rep cmpsb
     ret
 
-msg db 'Welcome to My Simple Kernel!', 0
+msg db 'Welcome to CheeseOS!', 0
 prompt db '>', 0
 echo_command db 'echo', 0
 echo_message db 'You typed: ', 0
