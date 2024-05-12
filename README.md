@@ -59,7 +59,3 @@ Contributions to CheeseOS are welcome! If you find any bugs or want to suggest i
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
-Feel free to customize the README further based on your preferences or additional features of CheeseOS!
