@@ -1,5 +1,3 @@
-Here's the updated README for CheeseOS with the current status and additional features:
-
 # Cheese Operating System (CheeseOS)
 
 ## Overview
