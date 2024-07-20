@@ -1,21 +1,21 @@
 [org 0x7c00]
 
-    mov ax, 0x07c0
-    mov ds, ax
+mov ax, 0x07c0
+mov ds, ax
 
-    mov si, boot_message
-    call print
+mov si, boot_message
+call print
 
-    ; Load kernel
-    mov bx, kernel_start
-    mov es, ax
-    mov cx, kernel_size
-    mov ah, 0x02
-    mov al, 1
-    mov dl, 0
-    int 0x13
+; Load kernel
+mov bx, kernel_start
+mov es, ax
+mov cx, kernel_size
+mov ah, 0x02
+mov al, 1
+mov dl, 0
+int 0x13
 
-    jmp 0x0000:0x7e00
+jmp 0x0000:0x7e00
 
 print:
     lodsb
