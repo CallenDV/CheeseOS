@@ -1,5 +1,7 @@
 # Cheese Operating System (CheeseOS)
 
+> 🛈 README update coming soon, stay tuned!
+
 ## Overview
 CheeseOS is a minimalistic operating system built from scratch in Assembly language. It provides basic functionality such as a command prompt, file system simulation, and keyboard input handling. CheeseOS is designed for educational purposes to understand the fundamentals of operating system development.
 
