@@ -1,5 +1,5 @@
 section .text
-    global isr_keyboard
+global isr_keyboard
 
 isr_keyboard:
     pusha           ; Save general-purpose registers
