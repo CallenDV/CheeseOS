@@ -111,7 +111,7 @@ section .data
 
 section .text
 idt_entries:
-    times 256 dw isr_default  ; Fill IDT with default handler addresses
+    times 256 dd isr_default  ; Fill IDT with default handler addresses
 
 isr_default:
     cli
@@ -211,3 +211,42 @@ compare_file_names_write:
     jne next_file_write
     cmp al, 0  ; Check if end of file name
     je file_found_write
+    inc cx
+    jmp compare_file_names_write
+
+next_file_write:
+    lodsb
+    cmp al, 0
+    jne next_file_write
+    mov si, di
+    add si, cx
+    mov cx, 0
+    lodsb
+    cmp al, 0
+    je no_file_found_write
+    add si, cx
+    jmp find_file_write
+
+file_found_write:
+    lodsb
+    cmp al, 0
+    jne file_found_write
+    mov si, file_system
+    add si, 32
+    mov cx, 0
+    jmp write_file_content
+
+write_file_content:
+    lodsb
+    or al, al
+    jz file_content_written
+    stosb
+    jmp write_file_content
+
+file_content_written:
+    ret
+
+no_file_found_write:
+    mov si, no_file_message
+    call print_prompt
+    ret
