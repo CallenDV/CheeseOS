@@ -5,21 +5,34 @@ section .text
     mov si, msg
     call print
 
-    ; Initialize interrupt descriptor table (IDT)
     mov ax, 0
     mov ds, ax
     mov si, idt
     lidt [si]
 
-    cli  ; Disable interrupts
-    mov al, 0x20  ; Set PIC mask to allow interrupts
+    cli
+    mov al, 0x20
     out 0x21, al
-    sti  ; Enable interrupts
+    sti
 
-    mov si, prompt
-    call print_prompt
-
-    jmp $
+        mov si, prompt
+        call print_prompt
+    
+    command_loop:
+        mov ah, 0x00
+        int 0x16
+        mov [key_pressed], al
+        
+        cmp al, 0x0D
+        je process_command
+        
+        mov ah, 0x0e
+        int 0x10
+        jmp command_loop
+    
+    process_command:
+        call handle_command
+        jmp command_loop
 
 print:
     lodsb
@@ -51,15 +64,12 @@ handle_command:
     ret
 
 execute_command:
-    ; Check for "echo" command
     mov di, echo_command
     call compare_command
     jc echo_found
-    ; Check for "read" command
     mov di, read_command
     call compare_command
     jc read_found
-    ; Check for "write" command
     mov di, write_command
     call compare_command
     jc write_found
@@ -75,14 +85,23 @@ echo_found:
 
 read_found:
     ; Execute read command
-    mov si, read_message
-    call print_prompt
-    mov si, file_content
-    call read_file
+compare_command:
+    push si
+    push di
+    mov cx, 4
+    cld
+    repe cmpsb
+    je .match
+    clc
+    jmp .done
+.match:
+    stc
+.done:
+    pop di
+    pop si
     ret
 
 write_found:
-    ; Execute write command
     mov si, write_message
     call print_prompt
     mov si, si_command_buffer
@@ -145,10 +164,10 @@ find_file:
     call compare_file_names
 
 compare_file_names:
-    lodsb   ; Load byte from SI (file name) to AL
-    cmp al, [dx]  ; Compare byte from directory with byte from file name
+    lodsb
+    cmp al, [dx]
     jne next_file
-    cmp al, 0  ; Check if end of file name
+    cmp al, 0
     je file_found
     inc cx
     jmp compare_file_names
@@ -194,22 +213,22 @@ no_file_message db 'File not found!', 0
 
 write_file:
     mov cx, 0
-    mov dx, si  ; Move file name pointer to DX
+    mov dx, si
     mov si, file_system
     mov di, directory
     jmp compare_file_names_write
 
 find_file_write:
     mov cx, 0
-    mov dx, si  ; Move file name pointer to DX
+    mov dx, si
     mov si, di
     call compare_file_names_write
 
 compare_file_names_write:
-    lodsb   ; Load byte from SI (file name) to AL
-    cmp al, [dx]  ; Compare byte from directory with byte from file name
+    lodsb
+    cmp al, [dx]
     jne next_file_write
-    cmp al, 0  ; Check if end of file name
+    cmp al, 0 
     je file_found_write
     inc cx
     jmp compare_file_names_write
@@ -250,3 +269,10 @@ no_file_found_write:
     mov si, no_file_message
     call print_prompt
     ret
+
+command_not_found:
+    mov si, unknown_command
+    call print_prompt
+    ret
+
+unknown_command db 'Unknown command!', 0
